@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>7 segments multi display</title>
+    <script src="p5.min.js"></script>
+    <style>
+        html{
+            height: 100%;
+        }
+        body{
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        canvas{
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <script>
+        let controler;
+        const offColor = '#300';
+        const onColor = '#f00';
+        const offDisplay = true;
+
+        function setup(){
+            createCanvas(1860, 540);
+            controler = new Controler();
+        }
+
+        class Display{
+            constructor(offsetX, offsetY){
+                this._leds = [
+                    new LED(offsetX+20, offsetY, true),
+                    new LED(offsetX+120, offsetY+20, false),
+                    new LED(offsetX+120, offsetY+130, false),
+                    new LED(offsetX+20, offsetY+230, true),
+                    new LED(offsetX, offsetY+130, false),
+                    new LED(offsetX, offsetY+20, false),
+                    new LED(offsetX+20, offsetY+115, true)
+                ];
+                this._numbers ={
+                    0: [true, true, true, true, true, true, false],
+                    1: [false, true, true, false, false, false, false],
+                    2: [true, true, false, true, true, false, true],
+                    3: [true, true, true, true, false, false, true],
+                    4: [false, true, true, false, false, true, true],
+                    5: [true, false, true, true, false, true, true],
+                    6: [true, true, true, true, true, false, true],
+                    7: [true, true, true, false, false, false, false],
+                    8: [true, true, true, true, true, true, true],
+                    9: [true, true, true, true, false, true, true],
+                    x: [false, false, false, false, false, false, false]
+                }
+            }
+
+            get leds(){
+                return this._leds;
+            }
+            get numbers(){
+                return this._numbers;
+            }
+
+            draw(n){
+                const number = this.numbers[n];
+                for(let i = 0; i < 7; i++){
+                    this.leds[i].state = number[i];
+                }
+            }
+        }
+
+        class LED{
+            constructor(x, y, p){
+                this._x = x;
+                this._y = y;
+                this._p = p;
+                this._state = false;
+            }
+
+            get x(){
+                return this._x;
+            }
+            get y(){
+                return this._y;
+            }
+            get p(){
+                return this._p;
+            }
+            get state(){
+                return this._state;
+            }
+
+            set state(s){
+                this._state = s;
+                this.draw();
+            }
+
+            draw(){
+                push();
+                fill((this.state) ? onColor : offColor);
+                if(offDisplay && !this.state){
+                    fill(255);
+                    noStroke();
+                }
+                (this.p) ? rect(this.x, this.y, 100, 20, 20) : rect(this.x, this.y, 20, 100, 20);
+                pop();
+            }
+        }
+
+        class Controler{
+            constructor(){
+                this._displays = [
+                    new Display(30, 30),
+                    new Display(200, 30),
+                    new Display(370, 30),
+                    new Display(550, 30),
+                    new Display(730, 30),
+                    new Display(910, 30),
+                    new Display(1090, 30),
+                    new Display(1270, 30),
+                    new Display(1450, 30),
+                    new Display(1630, 30)
+                ];
+            }
+
+            get displays(){
+                return this._displays;
+            }
+
+            number(n){
+                n = n.toString();
+                if(n.length < 10) n = 'x'.repeat(10-n.length) + n;
+                n = n.split('');
+                for(let i = 9; i >= 0; i--){
+                    this.displays[i].draw(n[i]);
+                }
+            }
+        }
+
+        function draw(){
+            background(255);
+            stroke(0);
+            controler.number(2948264018);
+        }
+    </script>
+</body>
+</html>
